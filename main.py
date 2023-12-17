@@ -33,31 +33,57 @@ def main():
     screen.fill(p.Color('white'))
     gs = engine.GameState()
     print(gs.board)
-    load_images() # only once, before the while loop
+    load_images() # only once, before the while loop.
     running = True
+    sq_selected = () # keeps track of user's last click.
+    player_clicks = [] # to move, keeps track of user's several clicks.
 
     while running:
         for e in p.event.get():
             if e.type == p.QUIT:
                 running = False
+
+            elif e.type == p.MOUSEBUTTONDOWN:
+                location = p.mouse.get_pos() # x, y coordinates of the mouse.
+                row = location[1] // SQ_SIZE
+                col = location[0] // SQ_SIZE
+                sq_selected = (row, col)
+
+                if sq_selected == (row, col): # if user clicks the same square, it usually means an undo, so we undo their last move.
+                    sq_selected = () # undo.
+                    player_clicks = [] # undo the click as well, the user undid their move.
+                else:
+                    sq_selected = (row, col)
+                    player_clicks.append(sq_selected) # append for both first and second clicks.
+                    print(player_clicks)
+
+                if len(player_clicks) == 2:
+                    print(player_clicks[0])
+                    print(player_clicks[1])
+                    move = engine.Move(player_clicks[0], player_clicks[1], gs.board)
+                    print(move.get_chess_notation())
+                    gs.make_move(move)
+                    sq_selected = () # reset user click.
+                    player_clicks = [] # after the move, reset the array for the next move.
+
+        
         draw_game_state(screen, gs)
         clock.tick(MAX_FPS)
         p.display.flip()
 
 '''
-draws the squares on the board
+draws the squares on the board.
 '''
-def draw_board(screen, board):
+def draw_board(screen):
     colors = [p.Color('white'), p.Color('gray')]
     for r in range(DIMENSION):
         for c in range(DIMENSION):
             color = colors[((r + c) % 2)]
             p.draw.rect(screen, color, p.Rect(c * SQ_SIZE ,r * SQ_SIZE, SQ_SIZE, SQ_SIZE))
             
-            
 
 '''
-draws the pieces on top of those squares
+draws the pieces on top of those squares.
 '''
 def draw_pieces(screen, board):
     for r in range(DIMENSION):
@@ -67,10 +93,10 @@ def draw_pieces(screen, board):
                 screen.blit(IMAGES[piece], p.Rect(c * SQ_SIZE, r * SQ_SIZE, SQ_SIZE, SQ_SIZE))
 
 '''
-responsible for handling all the graphics within a current game state
+responsible for handling all the graphics within a current game state.
 '''
 def draw_game_state(screen ,gs):
-    draw_board(screen, gs.board)
+    draw_board(screen)
     draw_pieces(screen, gs.board)
 
 
