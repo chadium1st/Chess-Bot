@@ -64,9 +64,9 @@ def main():
                 else:
                     sq_selected = (row, col)
                     player_clicks.append(sq_selected) # append for both first and second clicks.
-                    print(player_clicks)
+                    # print(player_clicks)
 
-                if len(player_clicks) == 2:
+                if len(player_clicks) == 2: # after the second click
                     print(player_clicks[0])
                     print(player_clicks[1])
                     move = engine.Move(player_clicks[0], player_clicks[1], gs.board)
@@ -76,8 +76,11 @@ def main():
                         gs.make_move(move)
                         move_made = True
                     
-                    sq_selected = () # reset user clicks.
-                    player_clicks = [] # after the move, reset the array for the next move.
+                        sq_selected = () # reset user clicks.
+                        player_clicks = [] # after the move, reset the array for the next move.
+
+                    else:
+                        player_clicks = [sq_selected]
 
         if move_made:
             valid_moves = gs.get_valid_moves()
