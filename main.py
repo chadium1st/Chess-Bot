@@ -32,6 +32,8 @@ def main():
     clock = p.time.Clock()
     screen.fill(p.Color('white'))
     gs = engine.GameState()
+    valid_moves = gs.get_valid_moves()
+    move_made = False # flag for when a move is made
     print(gs.board)
     load_images() # only once, before the while loop.
     running = True
@@ -43,11 +45,18 @@ def main():
             if e.type == p.QUIT:
                 running = False
 
+            # KEY HANDLERS:
+            elif e.type == p.KEYDOWN:
+                if e.key == p.K_z: # undo a move when z is pressed.
+                    gs.undo_move()
+                    move_made = True
+
+
+            # MOUSE HANDLERS:
             elif e.type == p.MOUSEBUTTONDOWN:
                 location = p.mouse.get_pos() # x, y coordinates of the mouse.
                 row = location[1] // SQ_SIZE
                 col = location[0] // SQ_SIZE
-                sq_selected = (row, col)
 
                 if sq_selected == (row, col): # if user clicks the same square, it usually means an undo, so we undo their last move.
                     sq_selected = () # undo.
@@ -62,11 +71,18 @@ def main():
                     print(player_clicks[1])
                     move = engine.Move(player_clicks[0], player_clicks[1], gs.board)
                     print(move.get_chess_notation())
-                    gs.make_move(move)
-                    sq_selected = () # reset user click.
+
+                    if move in valid_moves:
+                        gs.make_move(move)
+                        move_made = True
+                    
+                    sq_selected = () # reset user clicks.
                     player_clicks = [] # after the move, reset the array for the next move.
 
-        
+        if move_made:
+            valid_moves = gs.get_valid_moves()
+            move_made = False
+
         draw_game_state(screen, gs)
         clock.tick(MAX_FPS)
         p.display.flip()
@@ -98,7 +114,6 @@ responsible for handling all the graphics within a current game state.
 def draw_game_state(screen ,gs):
     draw_board(screen)
     draw_pieces(screen, gs.board)
-
 
 if __name__ == '__main__':
     main()
