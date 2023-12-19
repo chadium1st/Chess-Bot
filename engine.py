@@ -24,6 +24,15 @@ class GameState():
 			['wR', 'wN', 'wB', 'wQ', 'wK', 'wB', 'wN', 'wR'],
 		]
 
+		self.move_functions = {
+			'P': self.get_pawn_moves,
+			'R': self.get_rook_moves,
+			'N': self.get_knight_moves,
+			'B': self.get_bishop_moves,
+			'Q': self.get_queen_moves,
+			'K': self.get_king_moves
+		}
+
 		self.white_to_move = True
 		self.move_log = []
 
@@ -56,12 +65,10 @@ class GameState():
 		for r in range(len(self.board)):
 			for c in range(len(self.board[r])):
 				turn = self.board[r][c][0]
-				if (turn == 'w' and self.white_to_move) and (turn == 'b' and not self.white_to_move):
+				if (turn == 'w' and self.white_to_move) or (turn == 'b' and not self.white_to_move):
+					# print('here')
 					piece = self.board[r][c][1]
-					if piece == 'P':
-						self.get_pawn_moves(r, c, moves)
-					elif piece == 'R':
-						self.get_rook_moves(r, c, moves)
+					self.move_functions[piece](r, c, moves) # calls the appropriate move function based on the current piece
 
 		return moves
 
@@ -69,12 +76,52 @@ class GameState():
 	get all the pawn moves located at the specified row and column (r, c):
 	'''
 	def get_pawn_moves(self, r, c, moves):
-		pass
+		if self.white_to_move: # white pawn moves
+			if self.board[r-1][c] == '--': # 1 square advance
+				moves.append(Move((r, c), (r-1, c), self.board))
+				if r == 6 and self.board[r-2][c] == '--': # 2 square advance
+					moves.append(Move((r, c), (r-2, c), self.board))
+
+			if c-1 >= 0: # captures to the left
+				if self.board[r-1][c-1][0] == 'b': # enemy piece present to capture
+					moves.append(Move((r, c), (r-1, c), self.board))
+
+			if c+1 < len(self.board) - 1: # captures to the right
+				if self.board[r-1][c+1][0] == 'b': # enemy piece to capture
+					moves.append(Move((r, c), (r-1, c+1), self.board))
+
+		else: # black pawn moves
+			pass
+
 
 	'''
 	get all the rook moves located at the specified row and column (r, c):
 	'''
 	def get_rook_moves(self, r, c, moves):
+		pass
+
+	'''
+	get all the knight moves located at the specified row and column (r, c):
+	'''
+	def get_knight_moves(self, r, c, moves):
+		pass
+
+	'''
+	get all the bishop moves located at the specified row and column (r, c):
+	'''
+	def get_bishop_moves(self, r, c, moves):
+		pass
+
+	'''
+	get all the queen moves located at the specified row and column (r, c):
+	'''
+	def get_queen_moves(self, r, c, moves):
+		pass
+
+	'''
+	get all the king moves located at the specified row and column (r, c):
+	'''
+	def get_king_moves(self, r, c, moves):
 		pass
 
 class Move():
