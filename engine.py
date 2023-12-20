@@ -35,6 +35,8 @@ class GameState():
 
 		self.white_to_move = True
 		self.move_log = []
+		self.white_king_location = (7, 4)
+		self.black_king_location = (0, 4)
 
 	# takes a move as a parameter and executes it.
 	def make_move(self, move):
@@ -42,6 +44,15 @@ class GameState():
 		self.board[move.end_row][move.end_col] = move.piece_moved
 		self.move_log.append(move) # log the move so we can undo it later
 		self.white_to_move = not self.white_to_move # swap pieces
+
+		# update the king's location if it was moved.
+		if move.piece_moved == 'wK':
+			self.white_king_location == (move.end_row, move.end_col)
+
+		if move.piece_moved == 'bK':
+			self.black_king_location == (move.end_row, move.end_col)
+
+		
 
 	# undoes the last move.
 	def undo_move(self):
@@ -51,8 +62,18 @@ class GameState():
 			self.board[move.end_row][move.end_col] = move.piece_captured
 			self.white_to_move = not self.white_to_move # switch turns back.
 
+			# update the king's location if it was moved.
+			if move.piece_moved == 'wK':
+				self.white_king_location == (move.start_row, move.start_col)
+
+			if move.piece_moved == 'bK':
+				self.black_king_location == (move.start_row, move.start_col)
+
 	'''
-	all moves considering checks:
+	it performs the following tasks:
+	1. generate all possible moves
+	2. for each move, make the move
+	3. 
 	'''
 	def get_valid_moves(self):
 		return self.get_all_possible_moves()
